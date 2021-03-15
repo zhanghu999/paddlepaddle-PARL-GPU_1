@@ -25,7 +25,7 @@ from model import Model
 from algorithm import DQN  # from parl.algorithms import DQN  # parl >= 1.3.1
 from agent import Agent
 from replay_memory import ReplayMemory
-from order_env3 import CustomEnv, Order
+from order_env1 import CustomEnv, Order
 
 
 LEARN_FREQ = 5              # 训练频率，不需要每一个step都learn，攒一些新增经验后再learn，提高效率
@@ -42,6 +42,7 @@ def run_episode(env, agent, rpm):
     obs = env.reset(df)
     step = 0
     while True:
+        # 往经验池里面添加经验
         step += 1
         action = agent.sample(obs)  # 采样动作，所有动作都有概率被尝试到
         next_obs, reward, done, _ = env.step(action)
@@ -85,8 +86,8 @@ if __name__ == '__main__':
     df = pd.read_csv('./data/data4.csv')
     env = CustomEnv(df)
 
-    action_dim = env.action_space.n          # CartPole-v0: 2
-    obs_shape = env.observation_space.shape  # CartPole-v0: (4,)
+    action_dim = env.action_space.n
+    obs_shape = env.observation_space.shape
     rpm = ReplayMemory(MEMORY_SIZE)  # DQN的经验回放池
 
     # 根据parl框架构建agent
@@ -95,44 +96,39 @@ if __name__ == '__main__':
     agent = Agent(
         algorithm,
         obs_dim=obs_shape[0],
-        act_dim=action_dim,
+        act_dim=action_dim,  # 状态个数
         e_greed=0.1,  # 有一定概率随机选取动作，探索
         e_greed_decrement=1e-6)  # 随着训练逐步收敛，探索的程度慢慢降低
 
+    # # 先往经验池里存一些数据，避免最开始训练的时候样本丰富度不够
+    while len(rpm) < MEMORY_WARMUP_SIZE:
+        run_episode(env, agent, rpm)
 
-    # #    # 加载模型
-    # # save_path = './dqn_model.ckpt'
-    # # agent.restore(save_path)
-    #
-    # # # 先往经验池里存一些数据，避免最开始训练的时候样本丰富度不够
-    # while len(rpm) < MEMORY_WARMUP_SIZE:
-    #     run_episode(env, agent, rpm)
-    #
-    # max_episode = 2000
-    #
-    # # start train
-    # episode = 0
-    # while episode < max_episode:  # 训练max_episode个回合，test部分不计算入episode数量
-    #     # train part
-    #     for i in range(0, 50):
-    #         total_reward = run_episode(env, agent, rpm)
-    #         episode += 1
-    #         print("Episode== %d range== %i total_reward = %f."
-    #               % (episode, i, total_reward))
-    #
-    #     # test part
-    #     eval_reward = evaluate(env, agent, render=True)  # render=True 查看显示效果
-    #     logger.info('episode:{}    e_greed:{}   Test reward:{}'.format(
-    #         episode, agent.e_greed, eval_reward))
-    #
-    # # 训练结束，保存模型
-    # save_path = './dqn_model.ckpt'
-    # agent.save(save_path)
-    #
+    max_episode = 2000
+
+    # start train
+    episode = 0
+    while episode < max_episode:  # 训练max_episode个回合，test部分不计算入episode数量
+        # train part
+        for i in range(0, 50):
+            total_reward = run_episode(env, agent, rpm)
+            episode += 1
+            print("Episode== %d range== %i total_reward = %f."
+                  % (episode, i, total_reward))
+
+        # test part
+        eval_reward = evaluate(env, agent, render=True)  # render=True 查看显示效果
+        logger.info('episode:{}    e_greed:{}   Test reward:{}'.format(
+            episode, agent.e_greed, eval_reward))
+
+    # 训练结束，保存模型
+    save_path = './dqn_model.ckpt'
+    agent.save(save_path)
+
 ##########################################################################################
 
-    #    # 加载模型
-    save_path = './dqn_model.ckpt'
-    agent.restore(save_path)
-    eval_reward = evaluate(env, agent, render=True)  # render=True 查看显示效果
-    logger.info('Test total_reward:{}'.format(eval_reward))
+    # #    # 加载模型
+    # save_path = './dqn_model.ckpt'
+    # agent.restore(save_path)
+    # eval_reward = evaluate(env, agent, render=True)  # render=True 查看显示效果
+    # logger.info('Test total_reward:{}'.format(eval_reward))

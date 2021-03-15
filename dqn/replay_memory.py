@@ -23,12 +23,16 @@ class ReplayMemory(object):
 
     def __init__(self, max_size):
         # deque 是一个双端队列, 可以从两端append 的数据
+        # 队列的长度也就是经验池的容量
         self.buffer = collections.deque(maxlen=max_size)
 
     def append(self, exp):
+        # 往经验池里面添加一条经验
+        # 经验以元组的形式进行存储，有状态、动作、奖励、下一个状态以及判断这一条经验是不是这个episode的最后一条经验
         self.buffer.append(exp)
 
     def sample(self, batch_size):
+        # 从经验池当中随机抽取一个batch的数据
         mini_batch = random.sample(self.buffer, batch_size)
         obs_batch, action_batch, reward_batch, next_obs_batch, done_batch = [], [], [], [], []
 

@@ -33,7 +33,7 @@ class DQN(parl.Algorithm):
         self.model = model
         self.target_model = copy.deepcopy(model)
 
-        assert isinstance(act_dim, int)
+        assert isinstance(act_dim, int)  # 插入断言，判断act_dim是否为int类型
         assert isinstance(gamma, float)
         assert isinstance(lr, float)
         self.act_dim = act_dim

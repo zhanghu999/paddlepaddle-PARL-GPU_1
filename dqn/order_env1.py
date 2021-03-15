@@ -31,9 +31,9 @@ class Order:
         CAPACITY = 100
         self.df = df  # 数据文件
         self.current_step = 0  # 当前步数
-        self.current_capacity = CAPACITY  # 每一个阶段有300个产能
+        self.current_capacity = CAPACITY  # 每一个阶段拥有的产能
         self.need_capacity = 0  # 当前时间下完成所有已接受订单所需要的产能
-        self.arrival_time_old = 1  # 上一个订单的到达时间，若下一个订单与上一个订单一同达到，则完成当前订单所需要的产能不变
+        self.arrival_time_old = 1  # 上一个订单的到达时间，若下一个订单与上一个订单同时达到，则完成当前订单所需要的产能不变
 
     def observe(self):
         obs = np.array([
@@ -48,7 +48,6 @@ class Order:
         return obs  # 返回当前订单的状态
 
     def take_action(self, action):
-
         arrival_time = self.df.iloc[self.current_step].arrival_time
         customer_level = self.df.iloc[self.current_step].customer_level
         lead_time = self.df.iloc[self.current_step].lead_time

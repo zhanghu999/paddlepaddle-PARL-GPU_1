@@ -60,7 +60,7 @@ class Fcfs_Order:
         return done
 
 if __name__ == '__main__':
-    df = pd.read_csv('data/data4.csv')
+    df = pd.read_csv('../data/data4.csv')
     Fcfs = Fcfs_Order(df)
     total_reward = 0
     while Fcfs.is_done():

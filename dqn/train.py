@@ -100,35 +100,35 @@ if __name__ == '__main__':
         e_greed=0.1,  # 有一定概率随机选取动作，探索
         e_greed_decrement=1e-6)  # 随着训练逐步收敛，探索的程度慢慢降低
 
-    # # 先往经验池里存一些数据，避免最开始训练的时候样本丰富度不够
-    while len(rpm) < MEMORY_WARMUP_SIZE:
-        run_episode(env, agent, rpm)
-
-    max_episode = 2000
-
-    # start train
-    episode = 0
-    while episode < max_episode:  # 训练max_episode个回合，test部分不计算入episode数量
-        # train part
-        for i in range(0, 50):
-            total_reward = run_episode(env, agent, rpm)
-            episode += 1
-            print("Episode== %d range== %i total_reward = %f."
-                  % (episode, i, total_reward))
-
-        # test part
-        eval_reward = evaluate(env, agent, render=True)  # render=True 查看显示效果
-        logger.info('episode:{}    e_greed:{}   Test reward:{}'.format(
-            episode, agent.e_greed, eval_reward))
-
-    # 训练结束，保存模型
-    save_path = './dqn_model.ckpt'
-    agent.save(save_path)
+    # # # 先往经验池里存一些数据，避免最开始训练的时候样本丰富度不够
+    # while len(rpm) < MEMORY_WARMUP_SIZE:
+    #     run_episode(env, agent, rpm)
+    #
+    # max_episode = 2000
+    #
+    # # start train
+    # episode = 0
+    # while episode < max_episode:  # 训练max_episode个回合，test部分不计算入episode数量
+    #     # train part
+    #     for i in range(0, 50):
+    #         total_reward = run_episode(env, agent, rpm)
+    #         episode += 1
+    #         print("Episode== %d range== %i total_reward = %f."
+    #               % (episode, i, total_reward))
+    #
+    #     # test part
+    #     eval_reward = evaluate(env, agent, render=True)  # render=True 查看显示效果
+    #     logger.info('episode:{}    e_greed:{}   Test reward:{}'.format(
+    #         episode, agent.e_greed, eval_reward))
+    #
+    # # 训练结束，保存模型
+    # save_path = './dqn_model.ckpt'
+    # agent.save(save_path)
 
 ##########################################################################################
 
-    # #    # 加载模型
-    # save_path = './dqn_model.ckpt'
-    # agent.restore(save_path)
-    # eval_reward = evaluate(env, agent, render=True)  # render=True 查看显示效果
-    # logger.info('Test total_reward:{}'.format(eval_reward))
+    #    # 加载模型
+    save_path = './dqn_model.ckpt'
+    agent.restore(save_path)
+    eval_reward = evaluate(env, agent, render=True)  # render=True 查看显示效果
+    logger.info('Test total_reward:{}'.format(eval_reward))

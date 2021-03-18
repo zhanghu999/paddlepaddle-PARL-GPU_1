@@ -17,11 +17,13 @@
 import os
 import gym
 import numpy as np
+import pandas as pd
 import parl
 
 from agent import Agent
 from model import Model
 from algorithm import PolicyGradient  # from parl.algorithms import PolicyGradient
+from order_env1 import CustomEnv, Order
 
 from parl.utils import logger
 
@@ -31,7 +33,7 @@ LEARNING_RATE = 1e-3
 # 训练一个episode
 def run_episode(env, agent):
     obs_list, action_list, reward_list = [], [], []
-    obs = env.reset()
+    obs = env.reset(df)
     while True:
         obs_list.append(obs)
         action = agent.sample(obs)
@@ -49,7 +51,7 @@ def run_episode(env, agent):
 def evaluate(env, agent, render=False):
     eval_reward = []
     for i in range(5):
-        obs = env.reset()
+        obs = env.reset(df)
         episode_reward = 0
         while True:
             action = agent.predict(obs)
@@ -70,9 +72,10 @@ def calc_reward_to_go(reward_list, gamma=1.0):
     return np.array(reward_list)
 
 
-def main():
-    env = gym.make('CartPole-v0')
-    # env = env.unwrapped # Cancel the minimum score limit
+if __name__ == '__main__':
+    df = pd.read_csv('./data/data4.csv')
+    env = CustomEnv(df)
+
     obs_dim = env.observation_space.shape[0]
     act_dim = env.action_space.n
     logger.info('obs_dim {}, act_dim {}'.format(obs_dim, act_dim))
@@ -82,30 +85,29 @@ def main():
     alg = PolicyGradient(model, lr=LEARNING_RATE)
     agent = Agent(alg, obs_dim=obs_dim, act_dim=act_dim)
 
+
+    # for i in range(1000):
+    #     obs_list, action_list, reward_list = run_episode(env, agent)
+    #     if i % 10 == 0:
+    #         logger.info("Episode {}, Reward Sum {}.".format(
+    #             i, sum(reward_list)))
+    #
+    #     batch_obs = np.array(obs_list)
+    #     batch_action = np.array(action_list)
+    #     batch_reward = calc_reward_to_go(reward_list)
+    #
+    #     agent.learn(batch_obs, batch_action, batch_reward)
+    #     if (i + 1) % 100 == 0:
+    #         total_reward = evaluate(env, agent, render=True)
+    #         logger.info('Test reward: {}'.format(total_reward))
+    #
+    # # save the parameters to ./model.ckpt
+    # agent.save('./model.ckpt')
+
+###########################################################################################
+
     # 加载模型
-    # if os.path.exists('./model.ckpt'):
-    #     agent.restore('./model.ckpt')
-    #     run_episode(env, agent, train_or_test='test', render=True)
-    #     exit()
-
-    for i in range(1000):
-        obs_list, action_list, reward_list = run_episode(env, agent)
-        if i % 10 == 0:
-            logger.info("Episode {}, Reward Sum {}.".format(
-                i, sum(reward_list)))
-
-        batch_obs = np.array(obs_list)
-        batch_action = np.array(action_list)
-        batch_reward = calc_reward_to_go(reward_list)
-
-        agent.learn(batch_obs, batch_action, batch_reward)
-        if (i + 1) % 100 == 0:
-            total_reward = evaluate(env, agent, render=True)
-            logger.info('Test reward: {}'.format(total_reward))
-
-    # save the parameters to ./model.ckpt
-    agent.save('./model.ckpt')
-
-
-if __name__ == '__main__':
-    main()
+    if os.path.exists('./model.ckpt'):
+        agent.restore('./model.ckpt')
+        run_episode(env, agent)
+        exit()

@@ -56,6 +56,7 @@ def evaluate(env, agent, render=False):
         while True:
             action = agent.predict(obs)
             obs, reward, isOver, _ = env.step(action)
+            # print("------------")
             episode_reward += reward
             if render:
                 env.render()
@@ -100,7 +101,7 @@ if __name__ == '__main__':
     #     if (i + 1) % 100 == 0:
     #         total_reward = evaluate(env, agent, render=True)
     #         logger.info('Test reward: {}'.format(total_reward))
-    #
+
     # # save the parameters to ./model.ckpt
     # agent.save('./model.ckpt')
 
@@ -109,5 +110,6 @@ if __name__ == '__main__':
     # 加载模型
     if os.path.exists('./model.ckpt'):
         agent.restore('./model.ckpt')
-        run_episode(env, agent)
+        eval_reward = evaluate(env, agent, render=True)  # render=True 查看显示效果
+        logger.info('Test total_reward:{}'.format(eval_reward))
         exit()

@@ -25,7 +25,8 @@ from model import Model
 from algorithm import DQN  # from parl.algorithms import DQN  # parl >= 1.3.1
 from agent import Agent
 from replay_memory import ReplayMemory
-from order_env3 import CustomEnv, Order
+from order_env4 import CustomEnv, Order
+from data.data_generate_1 import Data
 
 
 LEARN_FREQ = 5              # 训练频率，不需要每一个step都learn，攒一些新增经验后再learn，提高效率
@@ -83,7 +84,13 @@ def evaluate(env, agent, render=False):
 
 
 if __name__ == '__main__':
-    df = pd.read_csv('./data/data5.csv')
+    headers = ['arrival_time', 'customer_level', 'delay_time', 'lead_time_1', 'lead_time_2',
+               'lead_time_3', 'lead_time_4', 'daily_capacity_1', 'daily_capacity_2', 'daily_capacity_3',
+               'daily_capacity_4',
+               'revenue']
+    da = Data()
+    df = da.data(headers)
+
     env = CustomEnv(df)
 
     action_dim = env.action_space.n

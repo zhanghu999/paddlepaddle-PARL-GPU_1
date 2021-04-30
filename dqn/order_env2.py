@@ -2,7 +2,7 @@ import gym
 import pandas as pd
 from gym import spaces
 import numpy as np
-
+# 无注释，适合训练模型时使用
 
 class CustomEnv(gym.Env):
     # metadata = {'render.modes' : ['human']}
@@ -107,7 +107,6 @@ class Order:
 
     def view(self):
         pass
-
 
 if __name__ == '__main__':
     NUM = 20  # 循环次数

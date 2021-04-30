@@ -2,7 +2,7 @@ import gym
 import pandas as pd
 from gym import spaces
 import numpy as np
-
+# 有注释，模型训练完毕后查看效果
 
 class CustomEnv(gym.Env):
     # metadata = {'render.modes' : ['human']}
